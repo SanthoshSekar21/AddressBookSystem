@@ -32,9 +32,23 @@ class AddressBook {
         }
     }
 
+    // Method to check for duplicate contacts
+    hasDuplicate(firstName, lastName) {
+        return this.contacts.some(contact => 
+            contact.firstName.toLowerCase() === firstName.toLowerCase() &&
+            contact.lastName.toLowerCase() === lastName.toLowerCase()
+        );
+    }
+
     // Method to add a new contact
     add(firstName, lastName, address, city, state, zip, phone, email) {
         this.validateInput(firstName, lastName, address, city, state, zip, phone, email);
+        
+        // Check for duplicates
+        if (this.hasDuplicate(firstName, lastName)) {
+            throw new Error(`Duplicate entry: Contact '${firstName} ${lastName}' already exists in the address book.`);
+        }
+
         this.contacts.push({ firstName, lastName, address, city, state, zip, phone, email });
     }
 
@@ -54,26 +68,25 @@ class AddressBook {
         }
     }
 
-    // Method to remove a contact by first name
-    findAndDelete(firstName) {
-        const index = this.contacts.findIndex(contact => contact.firstName.toLowerCase() === firstName.toLowerCase());
+    // Method to remove a contact by first name or full name
+    findAndDelete(name) {
+        const index = this.contacts.findIndex(contact => 
+            contact.firstName.toLowerCase() === name.toLowerCase() || 
+            `${contact.firstName} ${contact.lastName}`.toLowerCase() === name.toLowerCase()
+        );
 
         if (index !== -1) {
             const removedContact = this.contacts.splice(index, 1);
             console.log(`Contact '${removedContact[0].firstName} ${removedContact[0].lastName}' has been removed successfully from ${this.name} Address Book.`);
         } else {
-            console.log(`No contact found with the first name '${firstName}' in ${this.name} Address Book.`);
+            console.log(`No contact found with the name '${name}' in ${this.name} Address Book.`);
         }
     }
 
     // Linear search to find a contact by first name
     search(firstName) {
-        for (let i = 0; i < this.contacts.length; i++) {
-            if (this.contacts[i].firstName === firstName) {
-                return this.contacts[i];
-            }
-        }
-        return "Contact not found.";
+        const contact = this.contacts.find(contact => contact.firstName === firstName);
+        return contact ? contact : "Contact not found.";
     }
 
     // Method to edit an existing contact by first name
@@ -83,16 +96,13 @@ class AddressBook {
                 // Validate the updated inputs before applying changes
                 this.validateInput(newFirstName, newLastName, newAddress, newCity, newState, newZip, newPhone, newEmail);
 
-                // Update contact details
-                this.contacts[i].firstName = newFirstName;
-                this.contacts[i].lastName = newLastName;
-                this.contacts[i].address = newAddress;
-                this.contacts[i].city = newCity;
-                this.contacts[i].state = newState;
-                this.contacts[i].zip = newZip;
-                this.contacts[i].phone = newPhone;
-                this.contacts[i].email = newEmail;
+                // Check for duplicates
+                if (this.hasDuplicate(newFirstName, newLastName)) {
+                    throw new Error(`Duplicate entry: Contact '${newFirstName} ${newLastName}' already exists in the address book.`);
+                }
 
+                // Update contact details
+                this.contacts[i] = { firstName: newFirstName, lastName: newLastName, address: newAddress, city: newCity, state: newState, zip: newZip, phone: newPhone, email: newEmail };
                 console.log(`Contact '${existingFirstName}' has been updated successfully.`);
                 return;
             }
@@ -106,6 +116,7 @@ class AddressBook {
     }
 }
 
+// AddressBookManager to manage multiple AddressBook instances
 class AddressBookManager {
     constructor() {
         this.addressBooks = []; // Array to hold multiple AddressBook instances
@@ -144,17 +155,28 @@ try {
     friendsBook.add('John', 'Doe', '123 Elm St', 'Springfield', 'Illinois', '627011', '1234567890', 'john.doe@example.com');
     friendsBook.add('Jane', 'Doe', '456 Oak St', 'Springfield', 'Illinois', '627012', '0987654321', 'jane.doe@example.com');
 
-    // Get and print the number of contacts in the Family address book
-    console.log(`Number of contacts in ${familyBook.name} Address Book: ${familyBook.getNumberOfContacts() }`);
-console.log(`Number of contacts in ${friendsBook.name} Address Book: ${friendsBook.getNumberOfContacts() }`);
+    // Get and print the number of contacts in the address books
+    console.log(`Number of contacts in ${familyBook.name} Address Book: ${familyBook.getNumberOfContacts()}`);
+    console.log(`Number of contacts in ${friendsBook.name} Address Book: ${friendsBook.getNumberOfContacts()}`);
+
     // Edit a contact in the Family address book
     familyBook.edit('Santhosh', 'Santhosh', 'Sekar', 'Pudhukamoor', 'Arni', 'New State', '123456', '9876543210', 'newemail@example.com');
+
+    // Attempt to add a duplicate contact
+    try {
+        familyBook.add('Santhosh', 'Sekar', 'Another Address', 'Another City', 'Another State', '000000', '0000000000', 'duplicate@example.com');
+    } catch (error) {
+        console.error(error.message); // Handle duplicate entry error
+        
+        // Display current contacts after error
+        familyBook.print(); // Display current contacts to show they remain unchanged
+    }
 
     // Print all address books with detailed contact info
     manager.printAllBooks();
 
     // Remove a contact and reprint
-    friendsBook.findAndDelete('John');
+    friendsBook.findAndDelete('John Doe');
     friendsBook.print();
 
 } catch (error) {
