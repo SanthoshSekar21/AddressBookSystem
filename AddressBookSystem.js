@@ -99,6 +99,11 @@ class AddressBook {
         }
         console.log(`No contact found with the first name '${existingFirstName}'.`);
     }
+
+    // Method to get the number of contacts in the address book
+    getNumberOfContacts() {
+        return this.contacts.length;
+    }
 }
 
 class AddressBookManager {
@@ -139,6 +144,9 @@ try {
     friendsBook.add('John', 'Doe', '123 Elm St', 'Springfield', 'Illinois', '627011', '1234567890', 'john.doe@example.com');
     friendsBook.add('Jane', 'Doe', '456 Oak St', 'Springfield', 'Illinois', '627012', '0987654321', 'jane.doe@example.com');
 
+    // Get and print the number of contacts in the Family address book
+    console.log(`Number of contacts in ${familyBook.name} Address Book: ${familyBook.getNumberOfContacts() }`);
+console.log(`Number of contacts in ${friendsBook.name} Address Book: ${friendsBook.getNumberOfContacts() }`);
     // Edit a contact in the Family address book
     familyBook.edit('Santhosh', 'Santhosh', 'Sekar', 'Pudhukamoor', 'Arni', 'New State', '123456', '9876543210', 'newemail@example.com');
 
