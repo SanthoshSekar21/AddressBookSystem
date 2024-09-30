@@ -38,23 +38,32 @@ class AddressBook {
         this.contacts.push({ firstName, lastName, address, city, state, zip, phone, email });
     }
 
-    // Method to print all contacts
+    // Method to print all contacts with detailed information
     print() {
         if (this.contacts.length === 0) {
             console.log(`${this.name} Address Book is empty.`);
         } else {
-            console.log(`${this.name} Contact List:`);
+            console.log(`\n${this.name} Contact List:`);
             this.contacts.forEach((contact, index) => {
-                console.log(`${index + 1}. ${contact.firstName} ${contact.lastName}`);
+                console.log(`${index + 1}. Name: ${contact.firstName} ${contact.lastName}`);
+                console.log(`   Address: ${contact.address}, ${contact.city}, ${contact.state} - ${contact.zip}`);
+                console.log(`   Phone: ${contact.phone}`);
+                console.log(`   Email: ${contact.email}`);
+                console.log('-------------------------');
             });
         }
     }
 
     // Method to remove a contact by first name
-    remove(firstName) {
-        const initialLength = this.contacts.length;
-        this.contacts = this.contacts.filter(contact => contact.firstName !== firstName);
-        console.log(initialLength > this.contacts.length ? `Contact with first name '${firstName}' has been removed from ${this.name}.` : `No contact found with first name '${firstName}' in ${this.name}.`);
+    findAndDelete(firstName) {
+        const index = this.contacts.findIndex(contact => contact.firstName.toLowerCase() === firstName.toLowerCase());
+
+        if (index !== -1) {
+            const removedContact = this.contacts.splice(index, 1);
+            console.log(`Contact '${removedContact[0].firstName} ${removedContact[0].lastName}' has been removed successfully from ${this.name} Address Book.`);
+        } else {
+            console.log(`No contact found with the first name '${firstName}' in ${this.name} Address Book.`);
+        }
     }
 
     // Linear search to find a contact by first name
@@ -111,7 +120,7 @@ class AddressBookManager {
         }
 
         this.addressBooks.forEach((book, index) => {
-            console.log(`Address Book ${index + 1} (${book.name}):`);
+            console.log(`\nAddress Book ${index + 1} (${book.name}):`);
             book.print();
             console.log('---');
         });
@@ -121,19 +130,25 @@ class AddressBookManager {
 // Example usage
 const manager = new AddressBookManager();
 try {
-    // Create new address books with names
+    // Create new address books and add contacts
     const familyBook = manager.createAddressBook("Family");
     familyBook.add('Santhosh', 'Sekar', 'Vellore', 'Vellore', 'Tamil Nadu', '632002', '9952041871', 'Samuraisanthosh234@gmail.com');
     familyBook.add('Sathish', 'Kumar', 'Arni', 'Tiruvannamalai', 'Tamil Nadu', '632301', '9344991970', 'santhosh20sekar@gmail.com');
 
-    // Search using linear search
-    console.log("Search Result in Family Book:", familyBook.search('Santhosh')); // Output: The contact details for 'Santhosh'
-    
-    // Edit an existing contact in the Family address book
+    const friendsBook = manager.createAddressBook("Friends");
+    friendsBook.add('John', 'Doe', '123 Elm St', 'Springfield', 'Illinois', '627011', '1234567890', 'john.doe@example.com');
+    friendsBook.add('Jane', 'Doe', '456 Oak St', 'Springfield', 'Illinois', '627012', '0987654321', 'jane.doe@example.com');
+
+    // Edit a contact in the Family address book
     familyBook.edit('Santhosh', 'Santhosh', 'Sekar', 'Pudhukamoor', 'Arni', 'New State', '123456', '9876543210', 'newemail@example.com');
 
-    // Print the Family address book to see the updated contact
+    // Print all address books with detailed contact info
     manager.printAllBooks();
+
+    // Remove a contact and reprint
+    friendsBook.findAndDelete('John');
+    friendsBook.print();
+
 } catch (error) {
     console.error(error.message); // Handle validation errors
 }
