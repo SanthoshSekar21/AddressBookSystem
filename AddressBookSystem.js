@@ -1,15 +1,34 @@
+class Contact {
+    constructor(firstName, lastName, address, city, state, zip, phone, email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+        this.phone = phone;
+        this.email = email;
+    }
+
+    // Override toString method for better console output
+    toString() {
+        return `Name: ${this.firstName} ${this.lastName}, Address: ${this.address}, ${this.city}, ${this.state} - ${this.zip}, Phone: ${this.phone}, Email: ${this.email}`;
+    }
+}
+
 class AddressBook {
     constructor(name) {
         this.name = name; // Name of the address book (e.g., Family, Friends)
         this.contacts = [];
     }
 
-    // Validation Helper Function
     validateInput(firstName, lastName, address, city, state, zip, phone, email) {
+        console.log(`Validating: ${firstName}, ${lastName}, ${address}, ${city}, ${state}, ${zip}, ${phone}, ${email}`);
+        
         const patterns = {
             name: /^[A-Z][a-z]{2,}$/, // Names must start with a capital letter and be at least 3 characters long
             address: /^.{4,}$/, // Address, city, and state must be at least 4 characters long
-            zip: /^\d{6}$/, // Zip should be exactly 6 digits
+            zip: /^\d{5}$/, // Zip should be exactly 5 digits
             phone: /^\d{10}$/, // Phone should be exactly 10 digits
             email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/ // Valid email format
         };
@@ -20,13 +39,14 @@ class AddressBook {
             { test: patterns.address.test(address), message: "Address must be at least 4 characters long." },
             { test: patterns.address.test(city), message: "City must be at least 4 characters long." },
             { test: patterns.address.test(state), message: "State must be at least 4 characters long." },
-            { test: patterns.zip.test(zip), message: "Zip code must be exactly 6 digits." },
+            { test: patterns.zip.test(zip), message: "Zip code must be exactly 5 digits." },
             { test: patterns.phone.test(phone), message: "Phone number must be exactly 10 digits." },
             { test: patterns.email.test(email), message: "Email is not valid." }
         ];
 
         for (const validation of validations) {
             if (!validation.test) {
+                console.error(`Validation failed: ${validation.message}`);
                 throw new Error(validation.message);
             }
         }
@@ -50,7 +70,7 @@ class AddressBook {
             return; // Skip adding the duplicate and continue execution
         }
 
-        this.contacts.push({ firstName, lastName, address, city, state, zip, phone, email });
+        this.contacts.push(new Contact(firstName, lastName, address, city, state, zip, phone, email));
         console.log(`Contact '${firstName} ${lastName}' has been added successfully.`);
     }
 
@@ -61,13 +81,20 @@ class AddressBook {
         } else {
             console.log(`\n${this.name} Contact List:`);
             this.contacts.forEach((contact, index) => {
-                console.log(`${index + 1}. Name: ${contact.firstName} ${contact.lastName}`);
-                console.log(`   Address: ${contact.address}, ${contact.city}, ${contact.state} - ${contact.zip}`);
-                console.log(`   Phone: ${contact.phone}`);
-                console.log(`   Email: ${contact.email}`);
+                console.log(`${index + 1}. ${contact.toString()}`);
                 console.log('-------------------------');
             });
         }
+    }
+
+    // Method to sort contacts by name
+    sortByName() {
+        this.contacts.sort((a, b) => {
+            const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+            const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+        console.log(`Contacts in '${this.name}' Address Book sorted by name.`);
     }
 
     // Method to search for contacts by city using filter
@@ -148,7 +175,7 @@ class AddressBook {
                 }
 
                 // Update contact details
-                this.contacts[i] = { firstName: newFirstName, lastName: newLastName, address: newAddress, city: newCity, state: newState, zip: newZip, phone: newPhone, email: newEmail };
+                this.contacts[i] = new Contact(newFirstName, newLastName, newAddress, newCity, newState, newZip, newPhone, newEmail);
                 console.log(`Contact '${existingFirstName}' has been updated successfully.`);
                 return;
             }
@@ -177,46 +204,28 @@ class AddressBookManager {
 
     printAllBooks() {
         if (this.addressBooks.length === 0) {
-            console.log("No address books available.");
-            return;
+            console.log("No Address Books available.");
+        } else {
+            console.log("List of Address Books:");
+            this.addressBooks.forEach(book => console.log(`- ${book.name}`));
         }
-
-        this.addressBooks.forEach((book, index) => {
-            console.log(`\nAddress Book ${index + 1} (${book.name}):`);
-            book.print();
-            console.log('---');
-        });
     }
 }
 
 // Example usage
 const manager = new AddressBookManager();
+const familyAddressBook = manager.createAddressBook("Family");
 
-try {
-    // Create new address books and add contacts
-    const familyBook = manager.createAddressBook("Family");
-    familyBook.add('Santhosh', 'Sekar', 'Vellore', 'Vellore', 'Tamil Nadu', '632002', '9952041871', 'Samuraisanthosh234@gmail.com');
-    familyBook.add('Sathish', 'Kumar', 'Arni', 'Tiruvannamalai', 'Tamil Nadu', '632301', '9344991970', 'santhosh20sekar@gmail.com');
+// Adding contacts
+familyAddressBook.add("John", "Doe", "123 Elm St", "Springfield", "Ohio", "62701", "1234567890", "john.doe@example.com");
+familyAddressBook.add("Jane", "Smith", "456 Oak St", "Springfield", "Illinois", "62702", "0987654321", "jane.smith@example.com");
+familyAddressBook.add("Alice", "Johnson", "789 Pine St", "Springfield", "Illinois", "62703", "1122334455", "alice.johnson@example.com");
 
-    const friendsBook = manager.createAddressBook("Friends");
-    friendsBook.add('John', 'Doe', '123 Elm St', 'Springfield', 'Illinois', '627011', '1234567890', 'john.doe@example.com');
-    friendsBook.add('Jane', 'Doe', '456 Oak St', 'Springfield', 'Illinois', '627012', '0987654321', 'jane.doe@example.com');
+// Print contacts before sorting
+familyAddressBook.print();
 
-    // Get and print the number of contacts in the address books
-    console.log(`Number of contacts in ${familyBook.name} Address Book: ${familyBook.getNumberOfContacts()}`);
-    console.log(`Number of contacts in ${friendsBook.name} Address Book: ${friendsBook.getNumberOfContacts()}`);
+// Sort contacts by name
+familyAddressBook.sortByName();
 
-    // Print all address books with detailed contact info
-    manager.printAllBooks();
-
-    // Search for contacts in a specific city and state
-    familyBook.searchByCity('Vellore');
-    friendsBook.searchByState('Illinois');
-
-    // Count the number of contacts by city and state
-    familyBook.countByCity('Vellore');
-    friendsBook.countByState('Illinois');
-
-} catch (error) {
-    console.error(error.message); // Handle validation errors
-}
+// Print contacts after sorting
+familyAddressBook.print();
