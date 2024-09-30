@@ -10,7 +10,6 @@ class Contact {
         this.email = email;
     }
 
-    // Override toString method for better console output
     toString() {
         return `Name: ${this.firstName} ${this.lastName}, Address: ${this.address}, ${this.city}, ${this.state} - ${this.zip}, Phone: ${this.phone}, Email: ${this.email}`;
     }
@@ -18,7 +17,7 @@ class Contact {
 
 class AddressBook {
     constructor(name) {
-        this.name = name; // Name of the address book (e.g., Family, Friends)
+        this.name = name;
         this.contacts = [];
     }
 
@@ -52,7 +51,6 @@ class AddressBook {
         }
     }
 
-    // Method to check for duplicate contacts
     hasDuplicate(firstName, lastName) {
         return this.contacts.some(contact => 
             contact.firstName.toLowerCase() === firstName.toLowerCase() &&
@@ -60,21 +58,18 @@ class AddressBook {
         );
     }
 
-    // Method to add a new contact
     add(firstName, lastName, address, city, state, zip, phone, email) {
         this.validateInput(firstName, lastName, address, city, state, zip, phone, email);
         
-        // Check for duplicates
         if (this.hasDuplicate(firstName, lastName)) {
             console.warn(`Duplicate entry: Contact '${firstName} ${lastName}' already exists in the address book. Skipping addition.`);
-            return; // Skip adding the duplicate and continue execution
+            return; 
         }
 
         this.contacts.push(new Contact(firstName, lastName, address, city, state, zip, phone, email));
         console.log(`Contact '${firstName} ${lastName}' has been added successfully.`);
     }
 
-    // Method to print all contacts with detailed information
     print() {
         if (this.contacts.length === 0) {
             console.log(`${this.name} Address Book is empty.`);
@@ -87,7 +82,7 @@ class AddressBook {
         }
     }
 
-    // Method to sort contacts by name
+    // Sort contacts by name
     sortByName() {
         this.contacts.sort((a, b) => {
             const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
@@ -97,39 +92,46 @@ class AddressBook {
         console.log(`Contacts in '${this.name}' Address Book sorted by name.`);
     }
 
-    // Method to search for contacts by city using filter
+    // Sort contacts by city
+    sortByCity() {
+        this.contacts.sort((a, b) => a.city.localeCompare(b.city));
+        console.log(`Contacts in '${this.name}' Address Book sorted by city.`);
+    }
+
+    // Sort contacts by state
+    sortByState() {
+        this.contacts.sort((a, b) => a.state.localeCompare(b.state));
+        console.log(`Contacts in '${this.name}' Address Book sorted by state.`);
+    }
+
+    // Sort contacts by zip code
+    sortByZip() {
+        this.contacts.sort((a, b) => a.zip.localeCompare(b.zip));
+        console.log(`Contacts in '${this.name}' Address Book sorted by zip.`);
+    }
+
     searchByCity(city) {
         const filteredContacts = this.contacts.filter(contact => contact.city.toLowerCase() === city.toLowerCase());
-
-        // Map to get a formatted string for each contact
         const contactDetails = filteredContacts.map(contact => `${contact.firstName} ${contact.lastName}, Address: ${contact.address}, Zip: ${contact.zip}`);
-
         this.displayContacts(contactDetails, `Contacts found in the city '${city}':`);
     }
 
-    // Method to search for contacts by state using filter
     searchByState(state) {
         const filteredContacts = this.contacts.filter(contact => contact.state.toLowerCase() === state.toLowerCase());
-
-        // Map to get a formatted string for each contact
         const contactDetails = filteredContacts.map(contact => `${contact.firstName} ${contact.lastName}, Address: ${contact.address}, City: ${contact.city}, Zip: ${contact.zip}`);
-
         this.displayContacts(contactDetails, `Contacts found in the state '${state}':`);
     }
 
-    // Method to count contacts by city
     countByCity(city) {
         const count = this.contacts.filter(contact => contact.city.toLowerCase() === city.toLowerCase()).length;
         console.log(`Number of contacts in the city '${city}': ${count}`);
     }
 
-    // Method to count contacts by state
     countByState(state) {
         const count = this.contacts.filter(contact => contact.state.toLowerCase() === state.toLowerCase()).length;
         console.log(`Number of contacts in the state '${state}': ${count}`);
     }
 
-    // Method to display filtered contacts
     displayContacts(contactDetails, message) {
         if (contactDetails.length === 0) {
             console.log(`No contacts found.`);
@@ -141,7 +143,6 @@ class AddressBook {
         }
     }
 
-    // Method to remove a contact by first name or full name
     findAndDelete(name) {
         const index = this.contacts.findIndex(contact => 
             contact.firstName.toLowerCase() === name.toLowerCase() || 
@@ -156,25 +157,19 @@ class AddressBook {
         }
     }
 
-    // Linear search to find a contact by first name
     search(firstName) {
         const contact = this.contacts.find(contact => contact.firstName === firstName);
         return contact ? contact : "Contact not found.";
     }
 
-    // Method to edit an existing contact by first name
     edit(existingFirstName, newFirstName, newLastName, newAddress, newCity, newState, newZip, newPhone, newEmail) {
         for (let i = 0; i < this.contacts.length; i++) {
             if (this.contacts[i].firstName === existingFirstName) {
-                // Validate the updated inputs before applying changes
                 this.validateInput(newFirstName, newLastName, newAddress, newCity, newState, newZip, newPhone, newEmail);
-
-                // Check for duplicates
                 if (this.hasDuplicate(newFirstName, newLastName)) {
                     throw new Error(`Duplicate entry: Contact '${newFirstName} ${newLastName}' already exists in the address book.`);
                 }
 
-                // Update contact details
                 this.contacts[i] = new Contact(newFirstName, newLastName, newAddress, newCity, newState, newZip, newPhone, newEmail);
                 console.log(`Contact '${existingFirstName}' has been updated successfully.`);
                 return;
@@ -183,7 +178,6 @@ class AddressBook {
         console.log(`No contact found with the first name '${existingFirstName}'.`);
     }
 
-    // Method to get the number of contacts in the address book
     getNumberOfContacts() {
         return this.contacts.length;
     }
@@ -192,7 +186,7 @@ class AddressBook {
 // AddressBookManager to manage multiple AddressBook instances
 class AddressBookManager {
     constructor() {
-        this.addressBooks = []; // Array to hold multiple AddressBook instances
+        this.addressBooks = []; 
     }
 
     createAddressBook(name) {
@@ -226,6 +220,16 @@ familyAddressBook.print();
 
 // Sort contacts by name
 familyAddressBook.sortByName();
+familyAddressBook.print(); // Print after sorting by name
 
-// Print contacts after sorting
-familyAddressBook.print();
+// Sort contacts by city
+familyAddressBook.sortByCity();
+familyAddressBook.print(); // Print after sorting by city
+
+// Sort contacts by state
+familyAddressBook.sortByState();
+familyAddressBook.print(); // Print after sorting by state
+
+// Sort contacts by zip code
+familyAddressBook.sortByZip();
+familyAddressBook.print(); // Print after sorting by zip code
