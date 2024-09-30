@@ -90,6 +90,18 @@ class AddressBook {
         this.displayContacts(contactDetails, `Contacts found in the state '${state}':`);
     }
 
+    // Method to count contacts by city
+    countByCity(city) {
+        const count = this.contacts.filter(contact => contact.city.toLowerCase() === city.toLowerCase()).length;
+        console.log(`Number of contacts in the city '${city}': ${count}`);
+    }
+
+    // Method to count contacts by state
+    countByState(state) {
+        const count = this.contacts.filter(contact => contact.state.toLowerCase() === state.toLowerCase()).length;
+        console.log(`Number of contacts in the state '${state}': ${count}`);
+    }
+
     // Method to display filtered contacts
     displayContacts(contactDetails, message) {
         if (contactDetails.length === 0) {
@@ -185,7 +197,7 @@ try {
     const familyBook = manager.createAddressBook("Family");
     familyBook.add('Santhosh', 'Sekar', 'Vellore', 'Vellore', 'Tamil Nadu', '632002', '9952041871', 'Samuraisanthosh234@gmail.com');
     familyBook.add('Sathish', 'Kumar', 'Arni', 'Tiruvannamalai', 'Tamil Nadu', '632301', '9344991970', 'santhosh20sekar@gmail.com');
-    
+
     const friendsBook = manager.createAddressBook("Friends");
     friendsBook.add('John', 'Doe', '123 Elm St', 'Springfield', 'Illinois', '627011', '1234567890', 'john.doe@example.com');
     friendsBook.add('Jane', 'Doe', '456 Oak St', 'Springfield', 'Illinois', '627012', '0987654321', 'jane.doe@example.com');
@@ -200,6 +212,10 @@ try {
     // Search for contacts in a specific city and state
     familyBook.searchByCity('Vellore');
     friendsBook.searchByState('Illinois');
+
+    // Count the number of contacts by city and state
+    familyBook.countByCity('Vellore');
+    friendsBook.countByState('Illinois');
 
 } catch (error) {
     console.error(error.message); // Handle validation errors
