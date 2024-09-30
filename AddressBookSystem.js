@@ -40,21 +40,19 @@ class AddressBook {
         );
     }
 
-   // Method to add a new contact
-add(firstName, lastName, address, city, state, zip, phone, email) {
-    this.validateInput(firstName, lastName, address, city, state, zip, phone, email);
-    
-    // Check for duplicates
-    if (this.hasDuplicate(firstName, lastName)) {
-        console.warn(`Duplicate entry: Contact '${firstName} ${lastName}' already exists in the address book. Skipping addition.`);
-        return; // Skip adding the duplicate and continue execution
+    // Method to add a new contact
+    add(firstName, lastName, address, city, state, zip, phone, email) {
+        this.validateInput(firstName, lastName, address, city, state, zip, phone, email);
+        
+        // Check for duplicates
+        if (this.hasDuplicate(firstName, lastName)) {
+            console.warn(`Duplicate entry: Contact '${firstName} ${lastName}' already exists in the address book. Skipping addition.`);
+            return; // Skip adding the duplicate and continue execution
+        }
+
+        this.contacts.push({ firstName, lastName, address, city, state, zip, phone, email });
+        console.log(`Contact '${firstName} ${lastName}' has been added successfully.`);
     }
-
-    this.contacts.push({ firstName, lastName, address, city, state, zip, phone, email });
-    console.log(`Contact '${firstName} ${lastName}' has been added successfully.`);
-}
-
-
 
     // Method to print all contacts with detailed information
     print() {
@@ -72,28 +70,34 @@ add(firstName, lastName, address, city, state, zip, phone, email) {
         }
     }
 
-    // Method to search for contacts by city
+    // Method to search for contacts by city using filter
     searchByCity(city) {
         const filteredContacts = this.contacts.filter(contact => contact.city.toLowerCase() === city.toLowerCase());
-        if (filteredContacts.length === 0) {
-            console.log(`No contacts found in the city '${city}'.`);
-        } else {
-            console.log(`Contacts found in the city '${city}':`);
-            filteredContacts.forEach(contact => {
-                console.log(`- ${contact.firstName} ${contact.lastName}, Address: ${contact.address}, State: ${contact.state}, Zip: ${contact.zip}`);
-            });
-        }
+
+        // Map to get a formatted string for each contact
+        const contactDetails = filteredContacts.map(contact => `${contact.firstName} ${contact.lastName}, Address: ${contact.address}, Zip: ${contact.zip}`);
+
+        this.displayContacts(contactDetails, `Contacts found in the city '${city}':`);
     }
 
-    // Method to search for contacts by state
+    // Method to search for contacts by state using filter
     searchByState(state) {
         const filteredContacts = this.contacts.filter(contact => contact.state.toLowerCase() === state.toLowerCase());
-        if (filteredContacts.length === 0) {
-            console.log(`No contacts found in the state '${state}'.`);
+
+        // Map to get a formatted string for each contact
+        const contactDetails = filteredContacts.map(contact => `${contact.firstName} ${contact.lastName}, Address: ${contact.address}, City: ${contact.city}, Zip: ${contact.zip}`);
+
+        this.displayContacts(contactDetails, `Contacts found in the state '${state}':`);
+    }
+
+    // Method to display filtered contacts
+    displayContacts(contactDetails, message) {
+        if (contactDetails.length === 0) {
+            console.log(`No contacts found.`);
         } else {
-            console.log(`Contacts found in the state '${state}':`);
-            filteredContacts.forEach(contact => {
-                console.log(`- ${contact.firstName} ${contact.lastName}, Address: ${contact.address}, City: ${contact.city}, Zip: ${contact.zip}`);
+            console.log(message);
+            contactDetails.forEach(detail => {
+                console.log(`- ${detail}`);
             });
         }
     }
@@ -172,6 +176,7 @@ class AddressBookManager {
         });
     }
 }
+
 // Example usage
 const manager = new AddressBookManager();
 
@@ -179,9 +184,8 @@ try {
     // Create new address books and add contacts
     const familyBook = manager.createAddressBook("Family");
     familyBook.add('Santhosh', 'Sekar', 'Vellore', 'Vellore', 'Tamil Nadu', '632002', '9952041871', 'Samuraisanthosh234@gmail.com');
-    familyBook.add('Santhosh', 'Sekar', 'Vellore', 'Vellore', 'Tamil Nadu', '632002', '9952041871', 'Samuraisanthosh234@gmail.com'); // Duplicate
     familyBook.add('Sathish', 'Kumar', 'Arni', 'Tiruvannamalai', 'Tamil Nadu', '632301', '9344991970', 'santhosh20sekar@gmail.com');
-
+    
     const friendsBook = manager.createAddressBook("Friends");
     friendsBook.add('John', 'Doe', '123 Elm St', 'Springfield', 'Illinois', '627011', '1234567890', 'john.doe@example.com');
     friendsBook.add('Jane', 'Doe', '456 Oak St', 'Springfield', 'Illinois', '627012', '0987654321', 'jane.doe@example.com');
@@ -192,6 +196,10 @@ try {
 
     // Print all address books with detailed contact info
     manager.printAllBooks();
+
+    // Search for contacts in a specific city and state
+    familyBook.searchByCity('Vellore');
+    friendsBook.searchByState('Illinois');
 
 } catch (error) {
     console.error(error.message); // Handle validation errors
